@@ -11,6 +11,70 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [
+    'uses' => 'ShopController@getShop',
+    'as' => 'product.index'
+]);
+
+Route::get('/ind', [
+    'uses' => 'ShopController@getIndex',
+    'as' => 'product.index'
+]);
+
+Route::get('/add-to-cart/{id}', [
+    'uses' => 'ShopController@getAddToCart',
+    'as' => 'product.addToCart'
+]);
+
+Route::get('/remove-cart/{id}', [
+    'uses' => 'ShopController@getRemoveFromCart',
+    'as' => 'product.removeFromCart'
+]);
+Route::get('/shopping-cart', [
+    'uses' => 'ShopController@getCart',
+    'as' => 'product.shoppingCart'
+]);
+Route::post('/checkout', [
+    'uses' => 'ShopController@checkout',
+    'as' => 'product.checkout'
+]);
+Route::post('/login', [
+    'uses' => 'ShopController@login',
+    'as' => 'product.login'
+]);
+
+
+
+
+
+
+
+
+
+Route::get('/index', [
+    'uses' => 'ShopController@logout',
+    'as' => 'product.logout'
+]);
+
+Route::group(['middleware' => 'admin'], function () {
+    Route::get('/products', [
+        'uses' => 'SecurityController@getProducts',
+        'as' => 'security.products'
+    ]);
+    Route::get('/delete/{id}', [
+        'uses' => 'SecurityController@deleteProduct',
+        'as' => 'security.delete'
+    ]);
+    Route::get('/update/{id}', [
+        'uses' => 'SecurityController@updateProduct',
+        'as' => 'security.update'
+    ]);
+    Route::get('/product', [
+        'uses' => 'SecurityController@getProduct',
+        'as' => 'security.product'
+    ]);
+    Route::post('/product', [
+        'uses' => 'SecurityController@addProduct',
+        'as' => 'security.addproduct'
+    ]);
 });
