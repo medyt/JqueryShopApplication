@@ -15,7 +15,6 @@ Route::get('/', [
     'uses' => 'ShopController@getShop',
     'as' => 'product.index'
 ]);
-
 Route::get('/ind', [
     'uses' => 'ShopController@getIndex',
     'as' => 'product.index'
@@ -42,20 +41,14 @@ Route::post('/login', [
     'uses' => 'ShopController@login',
     'as' => 'product.login'
 ]);
-
-
-
-
-
-
-
-
-
-Route::get('/index', [
+Route::get('/logout', [
     'uses' => 'ShopController@logout',
     'as' => 'product.logout'
 ]);
-
+Route::get('/verify', [
+    'uses' => 'ShopController@verifyLogIn',
+    'as' => 'product.verifyLogIn'
+]);
 Route::group(['middleware' => 'admin'], function () {
     Route::get('/products', [
         'uses' => 'SecurityController@getProducts',
@@ -64,14 +57,6 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/delete/{id}', [
         'uses' => 'SecurityController@deleteProduct',
         'as' => 'security.delete'
-    ]);
-    Route::get('/update/{id}', [
-        'uses' => 'SecurityController@updateProduct',
-        'as' => 'security.update'
-    ]);
-    Route::get('/product', [
-        'uses' => 'SecurityController@getProduct',
-        'as' => 'security.product'
     ]);
     Route::post('/product', [
         'uses' => 'SecurityController@addProduct',

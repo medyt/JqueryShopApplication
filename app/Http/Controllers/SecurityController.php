@@ -6,62 +6,71 @@ use App\Product;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Session;
 
 class SecurityController extends Controller
 {
     public function getProducts() 
     {
         $products = Product::all();
-        return view('admin.products', ['products' => $products]);        
+        return $products;        
     }
     public function deleteProduct($id)
     {
         $product = Product::find($id);
         $product->delete();
-        return redirect()->route('security.products');
+        return true;
     }
-    public function updateProduct($id)
+    public function addProduct(Request $request)
     {
-        return view('admin.product' , ['id' => $id]);
-    }
-    public function getProduct()
-    {
-        return view('admin.product', ['id' => null]);
-    }
-    public function addProduct()
-    {
-        $addphoto = false;
-        if ($_FILES["fileToUpload"]["size"] != 0) {
-            if (strpos($_FILES["fileToUpload"]["type"], "image") !== false) {
-                $input = $_FILES["fileToUpload"]["tmp_name"];
-                $addphoto = true;
-            } else {
-                echo trans('messages.The type of your file is not accepted. We accept image file.');
-            }
-        } else {
-            echo trans('messages.You did not insert the picture');
+        if(isset($_POST['Title'])){
+            $request->session()->put('updatetitle', $_POST['Title']);
         }
-        if($addphoto) {
-            if($_POST['id']){
-                $output = "public/photo/photo-". $_POST["id"] .'.jpg';
-                $product = Product::find($_POST['id']);
-                $product->title = $_POST['Title'];
-                $product->description = $_POST['Description'];
-                $product->price = $_POST['Price'];
-                $product->save();
-            } else {
-                $product = new Product([
-                    'title' => $_POST['Title'],
-                    'description' => $_POST['Description'],
-                    'price' => $_POST['Price']
-                ]);
-                $product->save();
-                $output = "public/photo/photo-".$product->id.'.jpg';
-            }
-            move_uploaded_file(file_get_contents($input),$output);
-            return redirect()->route('security.products');
+        if(isset($_POST['Description'])){
+            $request->session()->put('updatedescription', $_POST['Description']);
+        }
+        if(isset($_POST['Price'])){
+            $request->session()->put('updateprice', $_POST['Price']);
+            return json_encode(["succes"=>"Description update"]);
+        }
+        if (isset($_POST['id'])) {
+            $request->session()->put('updateid', $_POST['id']);
+            return json_encode(["succes"=>true]);
         } else {
-            echo trans('messages.You must be logged in');
-        }               
+            $addphoto = false;
+            if ($_FILES["fileToUpload"]["size"] != 0) {
+                if (strpos($_FILES["fileToUpload"]["type"], "image") !== false) {
+                    $input = $_FILES["fileToUpload"]["tmp_name"];
+                    $addphoto = true;
+                } else {
+                    return json_encode(["error" => trans('messages.The type of your file is not accepted. We accept image file.')]);
+                }
+            } else {
+                return json_encode(["error" => trans('messages.You did not insert the picture')]);
+            }
+            if($addphoto) {
+                if (Session::has('updateid')) {
+                    $output = "public/photo/photo-". Session::get('updateid') .'.jpg';
+                    $product = Product::find(Session::get('updateid'));
+                    $product->title =  Session::get('updatetitle');
+                    $product->description = Session::get('updatedescription');
+                    $product->price = Session::get('updateprice');
+                    $product->save();
+                } else {
+                    $product = new Product([
+                        'title' =>  Session::get('updatetitle'),
+                        'description' => Session::get('updatedescription'),
+                        'price' =>Session::get('updateprice')
+                    ]);
+                    $product->save();
+                    $output = "public/photo/photo-".$product->id.'.jpg';
+                    return json_encode(["succes"=>true]);
+                }
+                move_uploaded_file(file_get_contents($input),$output);
+            } else {
+                return json_encode(["succes"=>true]); 
+            }   
+            return json_encode(["succes"=>true]);   
+        }        
     }
 }

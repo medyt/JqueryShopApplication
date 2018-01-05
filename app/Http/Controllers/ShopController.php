@@ -58,13 +58,15 @@ class ShopController extends Controller
             } else {
                 return json_last_error(["error" => 'messages.Wrong username or password']);
             }
-        }                
+        } else {
+            return json_last_error(["error" => 'messages.Wrong username or password']);
+        }               
     }
     public function logout(Request $request) 
     {        
         $request->session()->put('username',"");
         $request->session()->put('isLoggedIn',false);
-        return redirect()->route('product.index');
+        return json_encode(["succes"=>true]);
     }
     public function checkout(Request $request)
     {
@@ -89,5 +91,14 @@ class ShopController extends Controller
         mail(env("CHECKOUT_EMAIL"), "My order", $msg, $headers);
         $request->session()->put('cart',[]);
         return json_encode(["succes"=>true]);
+    }
+    public function verifyLogIn(Request $request)
+    {
+        $isLoggedIn = Session::get('isLoggedIn');
+        if ($isLoggedIn) {
+            return json_encode(true);
+        } else {
+            return json_encode(false);
+        }	
     }
 }
