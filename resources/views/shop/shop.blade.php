@@ -214,10 +214,7 @@
             }
             window.onhashchange();
         });
-    </script>    
-    <script>
-        
-    </script> 
+    </script>
     </head>
     <body>
         <div class="page index">
