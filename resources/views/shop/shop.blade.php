@@ -60,26 +60,6 @@
         });
         $(document).on('click', ".saveProduct", function() {             
             var uri = '/product';
-            var myValues = {
-                Title : document.getElementById("title").value,
-                Description : document.getElementById("description").value,
-                Price : document.getElementById("price").value
-            }
-            $.ajax({
-                method: 'POST',
-                url: uri,
-                data: myValues,
-                dataType: "json",
-                success: function(resultData) { 
-                    window.location.hash = '#products'; 
-                    if(resultData.success) {
-                        alert(resultData.success);
-                    }
-                    else {
-                        alert(resultData.error);
-                    }
-                }
-            });
             var fd = new FormData($("#fileinfo")[0]);
             $.ajax({
                 url : uri,
@@ -90,6 +70,7 @@
                 contentType: false, // tell jQuery not to set contentType
                 success: function (resultData)
                 {
+                    window.location.hash = '#products'; 
                     alert(resultData); 
                 }
             });                   
@@ -257,11 +238,11 @@
             <a href="#product" id="null" class="insertButton"><?= trans('messages.Add') ?></a>
             <a href="#" class="logoutButton"><?= trans('messages.Logout') ?></a>
         </div> 
-        <div class="page product">     
-            <input id="title" class="title solid" type="text" name="Title" placeholder="title"><br>
-            <input id="description" class="description solid" type="text" name="Description" placeholder="description"><br>    
-            <input id="price" class="price solid" type="text" name="Price" placeholder="price"><br>
+        <div class="page product">            
             <form method="post" id="fileinfo">
+                <input id="title" class="title solid" type="text" name="Title" placeholder="title"><br>
+                <input id="description" class="description solid" type="text" name="Description" placeholder="description"><br>    
+                <input id="price" class="price solid" type="text" name="Price" placeholder="price"><br>
                 <p name="Photo"><?= trans('messages.Photo') ?></p>
                 <input type="file" name="fileToUpload" id="fileToUpload">
             </form>    

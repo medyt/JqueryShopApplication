@@ -23,16 +23,6 @@ class SecurityController extends Controller
     }
     public function addProduct(Request $request)
     {
-        if(isset($_POST['Title'])){
-            $request->session()->put('updatetitle', $_POST['Title']);
-        }
-        if(isset($_POST['Description'])){
-            $request->session()->put('updatedescription', $_POST['Description']);
-        }
-        if(isset($_POST['Price'])){
-            $request->session()->put('updateprice', $_POST['Price']);
-            return json_encode(["success"=>"Description update"]);
-        }
         if (isset($_POST['id'])) {
             $request->session()->put('updateid', $_POST['id']);
             return json_encode(["success"=>true]);
@@ -52,15 +42,15 @@ class SecurityController extends Controller
                 if (Session::has('updateid')) {
                     $output = "public/photo/photo-". Session::get('updateid') .'.jpg';
                     $product = Product::find(Session::get('updateid'));
-                    $product->title =  Session::get('updatetitle');
-                    $product->description = Session::get('updatedescription');
-                    $product->price = Session::get('updateprice');
+                    $product->title =  $request->get('Title');
+                    $product->description = $request->get('Description');
+                    $product->price = $request->get('Price');
                     $product->save();
                 } else {
                     $product = new Product([
-                        'title' =>  Session::get('updatetitle'),
-                        'description' => Session::get('updatedescription'),
-                        'price' =>Session::get('updateprice')
+                        'title' =>  $request->get('Title'),
+                        'description' => $request->get('Description'),
+                        'price' => $request->get('Price')
                     ]);
                     $product->save();
                     $output = "public/photo/photo-".$product->id.'.jpg';
