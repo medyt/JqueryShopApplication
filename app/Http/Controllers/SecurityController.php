@@ -31,11 +31,11 @@ class SecurityController extends Controller
         }
         if(isset($_POST['Price'])){
             $request->session()->put('updateprice', $_POST['Price']);
-            return json_encode(["succes"=>"Description update"]);
+            return json_encode(["success"=>"Description update"]);
         }
         if (isset($_POST['id'])) {
             $request->session()->put('updateid', $_POST['id']);
-            return json_encode(["succes"=>true]);
+            return json_encode(["success"=>true]);
         } else {
             $addphoto = false;
             if ($_FILES["fileToUpload"]["size"] != 0) {
@@ -64,13 +64,13 @@ class SecurityController extends Controller
                     ]);
                     $product->save();
                     $output = "public/photo/photo-".$product->id.'.jpg';
-                    return json_encode(["succes"=>true]);
+                    return json_encode(["success"=>true]);
                 }
                 move_uploaded_file(file_get_contents($input),$output);
             } else {
-                return json_encode(["succes"=>true]); 
+                return json_encode(["success"=>true]); 
             }   
-            return json_encode(["succes"=>true]);   
+            return json_encode(["success"=>true]);   
         }        
     }
 }

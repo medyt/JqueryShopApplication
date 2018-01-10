@@ -30,15 +30,17 @@
                 data: myValues,
                 dataType: "json",
                 success: function(resultData) { 
-                    alert("Login succesful");
-                    window.location.replace("#products"); 
+                    alert(resultData.success);
+                    window.location.hash = '#products';
                     },
                 error: function(resultData) { alert(resultData) }
-            });                   
+            }); 
+            $( ".username" ).val('');
+            $( ".password" ).val('');                
         });
         $(document).on('click', ".logoutButton", function() { 
             var url = '/logout';
-            $.ajax(url, {success: function (response) {}});
+            $.ajax(url, {success: function (response) {window.location.hash = '#';}});
         });
         $(document).on('click', ".checkoutButton", function() {             
             var uri = '/checkout';
@@ -52,11 +54,11 @@
                 url: uri,
                 data: myValues,
                 dataType: "json",
-                success: function(resultData) { alert("Save Complete") },
+                success: function(resultData) { alert(resultData.success) },
                 error: function(resultData) { alert(resultData) }
             });         
         });
-        $(document).on('click', ".databaseButton", function() {             
+        $(document).on('click', ".saveProduct", function() {             
             var uri = '/product';
             var myValues = {
                 Title : document.getElementById("title").value,
@@ -69,9 +71,9 @@
                 data: myValues,
                 dataType: "json",
                 success: function(resultData) { 
-                    window.location.replace("#products"); 
-                    if(resultData.succes) {
-                        alert(resultData.succes);
+                    window.location.hash = '#products'; 
+                    if(resultData.success) {
+                        alert(resultData.success);
                     }
                     else {
                         alert(resultData.error);
@@ -99,6 +101,9 @@
         });
         $(document).on('click', ".updateButton", function() {             
             var uri = '/product';
+            var title = $(this).attr('title');
+            var description = $(this).attr('description');
+            var price = $(this).attr('price');
             var myValues = {
                 id : $(this).attr('id')
             }
@@ -108,10 +113,13 @@
                 data: myValues,
                 dataType: "json",
                 success: function(resultData) { 
-                    window.location.replace("#product"); 
+                    $( ".title" ).val(title);
+                    $( ".description" ).val(description);
+                    $( ".price" ).val(price); 
+                    window.location.hash = '#product';
                     },
                 error: function(resultData) { alert(resultData) }
-            });                   
+            });
         });
         $(document).on('click', ".insertButton", function() {             
             var uri = '/product';
@@ -123,8 +131,8 @@
                 url: uri,
                 data: myValues,
                 dataType: "json",
-                success: function(resultData) { 
-                    window.location.replace("#product"); 
+                success: function(resultData) {                     
+                    window.location.hash = '#product';
                     },
                 error: function(resultData) { alert(resultData) }
             });                   
@@ -153,13 +161,11 @@
                             '<td>'].join('');
                             if (window.location.hash == '#cart') {
                                 html += ['<button id="' + product.id + '" class="removeButton" ><?= trans('messages.Remove') ?></button>'].join('');
+                            } else if (window.location.hash == '#products') {
+                                html += ['<button id="' + product.id + '" class="deleteButton"><?= trans('messages.Delete') ?></button>',
+                                '<button id="' + product.id + '" title="' + product.title +'" description="' + product.description +'" price="' + product.price +'"class="updateButton"><?= trans('messages.Update') ?></button>'].join('');
                             } else {
-                                if (window.location.hash == '#products') {
-                                    html += ['<button id="' + product.id + '" class="deleteButton"><?= trans('messages.Delete') ?></button>',
-                                    '<button id="' + product.id + '" class="updateButton"><?= trans('messages.Update') ?></button>'].join('');
-                                } else {
-                                    html += ['<button id="' + product.id + '" class="addButton" ><?= trans('messages.Add') ?></button>'].join('');
-                                }
+                                html += ['<button id="' + product.id + '" class="addButton" ><?= trans('messages.Add') ?></button>'].join('');                               
                             }
                             html += ['</td>',
                         '</tr>'                        
@@ -168,25 +174,16 @@
                 return html;
             }
             window.onhashchange = function () {
+                $('.page').hide();
                 var url = '/verify';
-                var isLog = false;
+                var showindex = false;
+                if(!window.location.hash) {
+                    showindex = true;
+                }
                 $.ajax(url, {success: function (response) {
-                    $('.page').hide();
-                    switch(window.location.hash) {
-                        case '#cart':
-                            $('.cart').show();
-                            $.ajax('/shopping-cart', {
-                                dataType: 'json',
-                                success: function (response) {
-                                    $('.cart .list').html(renderList(response));
-                                }
-                            });
-                            break;
-                        case '#login':
-                            $('.login').show();
-                            break;
+                    switch(window.location.hash) {    
                         case '#products':
-                            if(response.localeCompare("true") == 0) {
+                            if(response == "true") {
                                 $('.products').show();
                                 $.ajax('/products', {
                                     dataType: 'json',
@@ -197,20 +194,36 @@
                             }
                             break;
                         case '#product':
-                            if(response.localeCompare("true") == 0) {  
+                            if(response == "true") {  
                                 $('.product').show();
                             } 
+                            break;                           
+                    }
+                }});
+                switch(window.location.hash) {
+                    case '#cart':
+                            $('.cart').show();
+                            $.ajax('/shopping-cart', {
+                                dataType: 'json',
+                                success: function (response) {
+                                    $('.cart .list').html(renderList(response));
+                                }
+                            });
                             break;
-                        default:            
+                    case '#login':
+                        $('.login').show();
+                        break;
+                    default:
+                        if(showindex){           
                             $('.index').show();
                             $.ajax('/ind', {
                                 dataType: 'json',
                                 success: function (response) {
                                     $('.index .list').html(renderList(response));
                                 }
-                            });
-                    }
-                }});
+                            }); 
+                        }   
+                }
             }
             window.onhashchange();
         });
@@ -235,8 +248,8 @@
             </div>   
         </div>
         <div class="page login">
-            <input id="username" type="text" class="form-control" name="username" required autofocus></br>
-            <input id="password" type="password" class="form-control" name="password" required></br>
+            <input id="username" type="text" class="username form-control" name="username" required autofocus></br>
+            <input id="password" type="password" class="password form-control" name="password" required></br>
             <button type="submit" class="loginButton"><?= trans('messages.Login') ?></button>
         </div>
         <div class="page products">
@@ -245,16 +258,16 @@
             <a href="#" class="logoutButton"><?= trans('messages.Logout') ?></a>
         </div> 
         <div class="page product">     
-            <input id="title" class="solid" type="text" name="Title" placeholder="title"><br>
-            <input id="description" class="solid" type="text" name="Description" placeholder="description"><br>    
-            <input id="price" class="solid" type="text" name="Price" placeholder="price"><br>
+            <input id="title" class="title solid" type="text" name="Title" placeholder="title"><br>
+            <input id="description" class="description solid" type="text" name="Description" placeholder="description"><br>    
+            <input id="price" class="price solid" type="text" name="Price" placeholder="price"><br>
             <form method="post" id="fileinfo">
                 <p name="Photo"><?= trans('messages.Photo') ?></p>
                 <input type="file" name="fileToUpload" id="fileToUpload">
             </form>    
             <div>
                 <a href="#products" class="button"><?= trans('messages.Products') ?></a>
-                <input type="submit" class="databaseButton" value="<?= trans('messages.Save') ?>" name="submit">
+                <input type="submit" class="saveProduct" value="<?= trans('messages.Save') ?>" name="submit">
             </div>        
         <div>          
     </body>

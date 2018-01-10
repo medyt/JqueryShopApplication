@@ -54,7 +54,7 @@ class ShopController extends Controller
             if ($_POST['username'] == env("LOGIN_USERNAME") && $_POST['password'] == env("LOGIN_PASSWORD")) {
                 $request->session()->put('isLoggedIn',true);
                 $request->session()->put('username',env("LOGIN_USERNAME"));
-                return json_encode(["succes"=>true]); 
+                return json_encode(["success"=>'messages.Successful login']); 
             } else {
                 return json_last_error(["error" => 'messages.Wrong username or password']);
             }
@@ -66,7 +66,7 @@ class ShopController extends Controller
     {        
         $request->session()->put('username',"");
         $request->session()->put('isLoggedIn',false);
-        return json_encode(["succes"=>true]);
+        return json_encode(["success"=>true]);
     }
     public function checkout(Request $request)
     {
@@ -90,7 +90,7 @@ class ShopController extends Controller
         $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n"; 
         mail(env("CHECKOUT_EMAIL"), "My order", $msg, $headers);
         $request->session()->put('cart',[]);
-        return json_encode(["succes"=>true]);
+        return json_encode(["success"=>'messages.Save complete']);
     }
     public function verifyLogIn(Request $request)
     {
